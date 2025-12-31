@@ -1,0 +1,72 @@
+graph TD
+    %% Styling
+    classDef public fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef student fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+    classDef org fill:#fff3e0,stroke:#ef6c00,stroke-width:2px;
+    classDef admin fill:#fce4ec,stroke:#c2185b,stroke-width:2px;
+    classDef db fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
+
+    %% Public Zone
+    subgraph Public_Zone ["Public Zone"]
+        Home(Home Page <br> index.php) ::: public
+        Login(Login Page <br> login.php) ::: public
+        Register(Register Page <br> register.php) ::: public
+    end
+
+    Home --> Login
+    Home --> Register
+    Login --> AuthCheck{Check Credentials <br> & Role}
+
+    %% Student Flow
+    subgraph Student_Panel ["Student Panel"]
+        SDash(Student Dashboard) ::: student
+        SEvents(Browse Events) ::: student
+        SDetail(Event Details) ::: student
+        SReg(Registration/Payment) ::: student
+        STicket(My Tickets <br> QR Code) ::: student
+    end
+
+    AuthCheck -- Role: Student --> SDash
+    SDash --> SEvents
+    SEvents --> SDetail
+    SDetail --> SReg
+    SReg --> STicket
+
+    %% Organization Flow
+    subgraph Org_Panel ["Organization Panel"]
+        ODash(Org Dashboard) ::: org
+        OCreate(Create Event) ::: org
+        OMyEvents(My Events List) ::: org
+        OParticipants(Participant List) ::: org
+        OEarnings(Earnings & Payouts) ::: org
+    end
+
+    AuthCheck -- Role: Org --> ODash
+    ODash --> OCreate
+    ODash --> OMyEvents
+    ODash --> OEarnings
+    OCreate -- Submit --> DB_Events[(Database: Events)] ::: db
+    OMyEvents --> OParticipants
+
+    %% Admin Flow
+    subgraph Admin_Panel ["Admin Panel"]
+        ADash(Admin Dashboard) ::: admin
+        AUsers(User Mgmt <br> Block/Verify) ::: admin
+        AEvents(Event Approval) ::: admin
+        ACats(Category Mgmt) ::: admin
+    end
+
+    AuthCheck -- Role: Admin --> ADash
+    ADash --> AUsers
+    ADash --> AEvents
+    ADash --> ACats
+    
+    %% Interactions & Database Connections
+    DB_Events -.-> |Fetch Approved| SEvents
+    DB_Events -.-> |Fetch Pending| AEvents
+    SReg -- Save Booking --> DB_Reg[(Database: Registrations)] ::: db
+    DB_Reg -.-> OParticipants
+    AEvents -- Approve/Reject --> DB_Events
+    
+    %% Legend/Key
+    %% Public (Blue), Student (Green), Org (Orange), Admin (Pink), Database (Purple)

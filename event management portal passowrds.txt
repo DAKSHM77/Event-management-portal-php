@@ -1,0 +1,10 @@
+event management portal passowrds
+
+Here are the login credentials for one user of each role:
+
+Global Password: password123
+
+Role	          Email	                Password
+Admin	        admin@eventportal.com	password123
+Student	        john@test.com	        password123
+Organizer	org1@test.com	        password123
